@@ -1,9 +1,12 @@
 // require('dotenv').config({path: "./.env"});
 
-import dotenv from "dotenv";
-
 // import mongoose  from "mongoose";
 // import { DB_NAME } from "./constants.js";
+
+
+// in this file we are just loading the variables from .env file and connecting to the database using the connectDB function defined in db/index.js file and then exporting the connection instance for use in other parts of the application
+import dotenv from "dotenv";
+
 
 import connectDB from "./db/index.js";
 

@@ -1,3 +1,5 @@
+// connect to MongoDB database using mongoose and export the connection instance for use in other parts of the application
+
 import mongoose  from "mongoose";
 import { DB_NAME } from "../constants.js";
 
