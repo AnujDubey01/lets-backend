@@ -6,6 +6,8 @@
 
 // in this file we are just loading the variables from .env file and connecting to the database using the connectDB function defined in db/index.js file and then exporting the connection instance for use in other parts of the application
 import dotenv from "dotenv";
+import app from "./app.js";
+
 
 
 import connectDB from "./db/index.js";
@@ -29,7 +31,7 @@ connectDB()
 });
 
 
-
+export default app;
 
 /*
 import express from "express";
