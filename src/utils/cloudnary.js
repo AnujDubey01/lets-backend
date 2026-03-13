@@ -16,6 +16,7 @@ cloudinary.config({
        (filePath, { 
             resource_type: "auto"
         })
+        // file has been uploaded to cloudinary, now we can delete the file from local storage
         console.log('Cloudinary upload response:', response.url);
         return response;    
 
