@@ -9,19 +9,28 @@ cloudinary.config({
 
  const uploadToCloudinary = async (filePath) => {
     try {
-        if(!filePath)return null
-            // upload file to cloudinary
-       
-       const response = await  cloudinary.uploader.upload
-       (filePath, { 
+        if(!filePath) return null
+        
+        console.log('Attempting to upload file:', filePath);
+        console.log('Cloudinary config:', {
+            cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+            api_key: process.env.CLOUDINARY_API_KEY ? 'Set' : 'Not set',
+            api_secret: process.env.CLOUDINARY_API_SECRET ? 'Set' : 'Not set'
+        });
+        
+        const response = await cloudinary.uploader.upload(filePath, { 
             resource_type: "auto"
         })
-        // file has been uploaded to cloudinary, now we can delete the file from local storage
+        
+        fs.unlinkSync(filePath);
         console.log('Cloudinary upload response:', response.url);
+        // fs.unlinkSync(filePath);
         return response;    
 
     } catch (error) {
-       fs.unlinkSync(filePath) // delete the file from local storage
+       if(fs.existsSync(filePath)) {
+           fs.unlinkSync(filePath);
+       }
        console.error('Cloudinary upload error:', error);
        return null;
     }
