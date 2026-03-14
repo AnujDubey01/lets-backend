@@ -4,6 +4,25 @@ import User from '../models/user.model.js';
 import uploadToCloudinary  from '../utils/cloudnary.js';
 import ApiResponse from '../utils/ApiResponse.js';
 
+const generateTokensAndSendResponse = async (user) => {
+    // generate access token and refresh token
+    try {
+        const User = await User.findById(user._id);
+       const refreshToken = user.generateRefreshToken();
+        const accessToken = user.generateAccessToken();
+        user.refreshToken = refreshToken;
+        await User.save({ validateBeforeSave: false });
+
+        return {
+            accessToken,
+            refreshToken
+        }
+
+    } catch (error) {
+        throw new ApiError(500, "Failed to generate tokens !!");
+    }
+
+}
 
 const registerUser = asyncHandler(async (req, res) => { 
 
@@ -74,6 +93,55 @@ const registerUser = asyncHandler(async (req, res) => {
 
 })
 
+const loginUser = asyncHandler(async (req, res) => {
+
+    // get email and password from frontend
+    const { email, username ,password } = req.body;
+
+    // username or email can be used for login, so we will check for both
+    if(!email && !username){
+        throw new ApiError(400, "Email or username is required !!");
+    }   
+
+    //find the user in db using email or username
+    const user = await User.findOne({
+        $or: [{email}, {username}]
+    })
+
+    if(!user){
+        throw new ApiError(404, "User not found with the provided email or username !!");
+    }
+
+    // password check 
+    const isPasswordCorrect = await user.isPasswordCorrect(password);
+
+    if(!isPasswordCorrect){
+        throw new ApiError(401, "Incorrect password !!");
+    }
+
+    // generate access token and refresh token
+    const {accessToken , refreshToken} = await generateTokensAndSendResponse(user);
+
+    const userWithoutSensitiveInfo = await User.findById(user._id).select("-password -refreshToken");
+
+    //send cookies and response
+
+    const options = {
+        httpOnly: true,
+        secure: true
+    }
+
+    return res.status(200).cookie("accessToken", accessToken, options).cookie("refreshToken", refreshToken, options).json(
+        new ApiResponse(200, "User logged in successfully !!", {
+            accessToken,
+            user: userWithoutSensitiveInfo,
+            refreshToken,
+            
+        })
+    )
+})
+
 export {
     registerUser,
+    loginUser
 }
