@@ -5,23 +5,20 @@ import uploadToCloudinary  from '../utils/cloudnary.js';
 import ApiResponse from '../utils/ApiResponse.js';
 
 const generateTokensAndSendResponse = async (user) => {
-    // generate access token and refresh token
     try {
-        const User = await User.findById(user._id);
-       const refreshToken = user.generateRefreshToken();
+        const refreshToken = user.generateRefreshToken();
         const accessToken = user.generateAccessToken();
         user.refreshToken = refreshToken;
-        await User.save({ validateBeforeSave: false });
+        await user.save({ validateBeforeSave: false });  // save on user instance, not User model
 
         return {
             accessToken,
             refreshToken
         }
-
-    } catch (error) {
-        throw new ApiError(500, "Failed to generate tokens !!");
-    }
-
+   } catch (error) {
+    console.error('Token generation error:', error);  // add this
+    throw new ApiError(500, "Failed to generate tokens !!");
+}
 }
 
 const registerUser = asyncHandler(async (req, res) => { 
@@ -161,8 +158,9 @@ const logoutUser = asyncHandler(async(req,res) => {
     }
     return res
     .status(200)
-    .cookie("accessToken", options)
-    .cookie("refreshToken",options)
+   // ✅ Correct - clear cookies properly
+    .clearCookie("accessToken", options)
+    .clearCookie("refreshToken", options)
     .json(
         new ApiResponse(200, {} , "User logged out successfully !!")
     )
