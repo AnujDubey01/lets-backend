@@ -308,9 +308,9 @@ const updateUserCover = asyncHandler(async (req, res) => {
         throw new ApiError(400, "cover file is missing !!");
     }
 
-    const cover = await uploadToCloudinary(CoverLocalPath);
+    const coverImage = await uploadToCloudinary(CoverLocalPath);
 
-    if(!cover.url){
+    if(!coverImage.url){
         throw new ApiError(400, "Error while uploading cover to cloudinary !!");
     }
 
@@ -318,7 +318,7 @@ const updateUserCover = asyncHandler(async (req, res) => {
         req.user?._id,
         {
             $set: {
-                cover: cover.url
+                coverImage: coverImage.url
             }
         },
         {new: true}
