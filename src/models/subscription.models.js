@@ -1,5 +1,5 @@
 // import mongoose from "mongoose";
-import  Mongoose , {
+import  mongoose , {
     Schema  }  from "mongoose";
 
     
